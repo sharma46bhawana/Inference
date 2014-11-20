@@ -23,7 +23,7 @@ def readFile():
         new_statements.append(statement.strip('\n'))
 
 
-def getClauses():
+def getClausesAndFacts():
     for new_statement in new_statements:
         if new_statement.find('=>')>0 :
             clauses.append(new_statement)
@@ -46,15 +46,30 @@ def checkFacts(input):
             return True
     return False
 
+def conclusionMatch(input):
+    flag = 0
+    inputFunctionName = input.split('(')[0]
+    for clause in clauses:
+        tempFunctionName = (clause.split('=>')[1]).split('(')[0]
+        if inputFunctionName == tempFunctionName:
+            flag = 1
+    if flag == 1:
+        return True
+    else:
+        return False
+
+
 def bcAlgorithm(result):
     print result
     if checkFacts(result):
         return True
-    else if conclusionMatch(result)
+    else:
+        if conclusionMatch(result):
+            return True
 
 if __name__ == '__main__':
     readFile()
     #print goal, statement_count, new_statements
-    getClauses()
-    bcAlgorithm(goal)
+    getClausesAndFacts()
+    print bcAlgorithm(goal)
 
