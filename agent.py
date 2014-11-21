@@ -1,5 +1,6 @@
 __author__ = 'Bhawana'
 
+# AI HW 3
 new_statements = []
 goal = ''
 goalFunction = None
