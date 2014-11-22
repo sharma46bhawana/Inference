@@ -62,10 +62,12 @@ def conclusionMatch(input):
 
 def getAtomicPremises(resultArgument,clause):
     premises = clause.split('=>')[0]
+    #print premises
     arrayOfPremises = premises.split('&')
+    newClauses = []
     for premise in arrayOfPremises:
-        substitu
-    return arrayOfPremises
+        newClauses.append(premise.replace('x',resultArgument))
+    return newClauses
 
 def checkForConclusion(result,conclusionFunction):
     resultArgCount, resArg1, resArg2 = getArguments(result)
@@ -112,9 +114,17 @@ def findSubstitution(result,conclusionFunction):
 
 
 
+def something(a,clause):
+    premises = clause.split('=>')[0]
+    arrayOfPremises = premises.split('&')
+    newClauses = []
+    for premise in arrayOfPremises:
+        newClauses.append(premise.replace('x',a))
+    print newClauses
+    #print arrayOfPremises
 
 def bcAlgorithm(result):
-    print result
+    #print result
     if checkFacts(result):
         return True
     else:
@@ -127,9 +137,12 @@ def bcAlgorithm(result):
                     if checkForConclusion(result,conclusionFunction):
                         constant = findSubstitution(result,conclusionFunction)
                         if constant != None:
-
-
-
+                            arrayOfPremises = getAtomicPremises(constant,clause)
+                            print arrayOfPremises
+                            for premise in arrayOfPremises:
+                                if bcAlgorithm(premise) == False:
+                                    return False
+                            return True
         else:
             return False
 
@@ -137,5 +150,7 @@ if __name__ == '__main__':
     readFile()
     #print goal, statement_count, new_statements
     getClausesAndFacts()
+    #a = "John"
+    #something(a,clauses[1])
+    #something(a,clauses[2])
     print bcAlgorithm(goal)
-
