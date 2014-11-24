@@ -1,3 +1,4 @@
+#!/usr/bin/python 
 __author__ = 'Bhawana'
 
 import re
@@ -9,7 +10,16 @@ goalFunction = None
 statement_count = 0
 facts = []
 clauses = []
-#resultFlag = False
+
+def replaceX(premise,constant):
+    if premise.find(',') > 0:
+        if premise.find('(x,')>0:
+            return premise.replace('(x','('+constant)
+        elif premise.find(',x')>0:
+            return premise.replace('x)',constant+')')
+    elif premise.find('(x')>0:
+        return premise.replace('(x','('+constant)
+
 
 def readFile():
     try:
@@ -25,6 +35,7 @@ def readFile():
 
     for statement in statements:
         new_statements.append(statement.strip('\n'))
+    filePtr.close()
 
 
 def getClausesAndFacts():
@@ -69,7 +80,7 @@ def getAtomicPremises(resultArgument,clause):
     arrayOfPremises = premises.split('&')
     newClauses = []
     for premise in arrayOfPremises:
-        newClauses.append(premise.replace('x',resultArgument))
+        newClauses.append(replaceX(premise,resultArgument))
     return newClauses
 
 def checkForConclusion(result,conclusionFunction):
@@ -163,14 +174,13 @@ def checkInFacts(premise):
 
 
 def bcAlgoWithoutSubstitution(premise):
-    #print premise
+
     values = []
     factValues = []
     flagForConstant = 0
     factValues = checkInFacts(premise)
     for value in factValues:
         values.append(value)
-    #print factValues
     for clause in clauses:
         conclusionFunction = clause.split('=>')[1]
         if conclusionFunction == premise:
@@ -182,7 +192,7 @@ def bcAlgoWithoutSubstitution(premise):
                         for eachPremise in premises:
                             if eachPremise.find('(x') or eachPremise.find('x)'):
                                 #print eachPremise," ",constant," ",premise, " ",premises
-                                temp = eachPremise.replace('x',constant)
+                                temp = replaceX(eachPremise,constant)
                                 if bcAlgorithm(temp) == False:
                                     flagForConstant = 0
                                     break
@@ -238,23 +248,17 @@ def bcAlgorithm(result):
                         else:
                             if sameConclusion(result,conclusionFunction):
                                 flagS = 0
-                                #print "same conclusion"
                                 premisesWithoutConstantValue = getAtomicPremisesWithoutValue(clause)
-                                #print premiseWithX(premisesWithoutConstantValue)
                                 flagFound,values = bcAlgoWithoutSubstitution(premiseWithX(premisesWithoutConstantValue))
-                                print values,premiseWithX(premisesWithoutConstantValue)
                                 if flagFound == 1:
                                     for value in values:
                                         for eachPremise in premisesWithoutConstantValue:
                                             if eachPremise.find('(x') or eachPremise('x)'):
-                                                #print eachPremise, values
-                                                temp = eachPremise.replace('x', value)
+                                                temp = replaceX(eachPremise,value)
                                                 if bcAlgorithm(temp) == False:
-                                                    #print temp
                                                     flagS = 0;
                                                     break
                                                 else:
-                                                    #print temp
                                                     flagS = 1
                                             else:
                                                 if bcAlgorithm(eachPremise) == False:
@@ -263,7 +267,6 @@ def bcAlgorithm(result):
                                                 else:
                                                     flagS = 1
                                         if flagS == 1:
-                                            #print value
                                             flag = True
                                             break
 
@@ -275,10 +278,23 @@ def bcAlgorithm(result):
         else:
             return False
 
-
+def writeFile(result):
+    try:
+        filePtr = open('output.txt','w+')
+    except:
+        print "File Write Error!"
+        exit()
+    if result == True:
+        filePtr.write('TRUE')
+    else:
+        filePtr.write('FALSE')
+    filePtr.close()
 
 if __name__ == '__main__':
+    x = 'HasSymptom(x,Fever)'
+    a = 'Alpha'
     readFile()
     getClausesAndFacts()
-    print bcAlgorithm(goal)
-    #print clauses[0].find('x')
+    result = bcAlgorithm(goal)
+    #print x.replace('(x',a)
+    writeFile(result)
